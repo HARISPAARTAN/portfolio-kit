@@ -4,3 +4,4 @@ node_modules/
 Thumbs.db
 .kit/
 kit-shots/
+__pycache__/

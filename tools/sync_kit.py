@@ -69,7 +69,7 @@ def archive_files(raw: bytes) -> dict[str, bytes]:
         with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
             for member in archive.getmembers():
                 path = PurePosixPath(member.name)
-                if "\\" in member.name or ":" in member.name or path.is_absolute() or ".." in path.parts:
+                if "\\" in member.name or ":" in member.name or "\x00" in member.name or path.is_absolute() or ".." in path.parts:
                     raise Refused(f"unsafe path in the archive: {member.name!r}")
                 if member.isdir():
                     continue
@@ -98,7 +98,7 @@ def load_manifest(raw: bytes, where: str) -> dict:
     """Parse a MANIFEST.json and check the keys that compare() and the destination guard rely on."""
     try:
         manifest = json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, ValueError) as exc:
+    except (UnicodeDecodeError, ValueError, RecursionError) as exc:
         raise Refused(f"{where} is not valid JSON: {exc}") from exc
     entries = manifest.get("files") if isinstance(manifest, dict) else None
     if (
@@ -149,7 +149,7 @@ def ensure_replaceable(dest: Path) -> None:
         return
     try:
         manifest = json.loads((dest / "MANIFEST.json").read_text(encoding="utf-8")) if {"MANIFEST.json", "VERSION"} <= names else None
-    except (OSError, ValueError):
+    except (OSError, ValueError, RecursionError):
         manifest = None
     if not isinstance(manifest, dict) or manifest.get("name") != KIT_NAME:
         raise Refused(f'refusing to replace {where}: it is not an earlier copy of the kit (needs MANIFEST.json with "name": "{KIT_NAME}" and VERSION)')

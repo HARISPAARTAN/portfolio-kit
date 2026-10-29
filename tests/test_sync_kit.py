@@ -304,6 +304,19 @@ class SyncKitTest(unittest.TestCase):
                 for outside in (self.dest.parent / "evil.txt", self.work / "evil.txt", self.work.parent / "evil.txt"):
                     self.assertFalse(outside.exists(), outside)
 
+    def test_a_nul_in_a_member_name_is_refused_and_the_destination_stays(self) -> None:
+        self.assertEqual(self.main_with_archive(make_tar(GOOD_MEMBERS))[0], 0)
+        before = snapshot(self.dest)
+        # A plain tar header would cut the name at the NUL, so the name travels in a PAX record.
+        nul = tarfile.TarInfo("dist/bad\x00name")
+        nul.pax_headers = {"path": "dist/bad\x00name"}
+        code, err = self.main_with_archive(make_tar(GOOD_MEMBERS, [nul]))
+        self.assertEqual(code, 1, err)
+        self.assertIn("unsafe path in the archive", err)
+        self.assertNotIn("Traceback", err)
+        self.assertEqual(snapshot(self.dest), before)
+        self.assertNoLeftovers()
+
     def test_special_members_are_refused(self) -> None:
         link = tarfile.TarInfo("dist/link")
         link.type = tarfile.SYMTYPE
@@ -335,6 +348,15 @@ class SyncKitTest(unittest.TestCase):
                 self.assertIn(message, done.stderr)
                 self.assertFalse(self.dest.exists())
                 self.assertNoLeftovers()
+
+    def test_a_deeply_nested_manifest_in_the_archive_is_a_clean_failure(self) -> None:
+        raw = make_tar([("dist/MANIFEST.json", b"[" * 100000), *((f"dist/{n}", d) for n, d in PAYLOAD.items())])
+        code, err = self.main_with_archive(raw)
+        self.assertEqual(code, 1, err)
+        self.assertIn("is not valid JSON", err)
+        self.assertNotIn("Traceback", err)
+        self.assertFalse(self.dest.exists())
+        self.assertNoLeftovers()
 
     # failure while installing
 
