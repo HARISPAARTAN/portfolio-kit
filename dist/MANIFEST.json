@@ -9,8 +9,8 @@
     },
     {
       "file": "echarts-theme.js",
-      "bytes": 2968,
-      "sha256": "521b5cdf83afa687d52161d15a85e52274f0074ac71dbde0c6579601ddc2aec3"
+      "bytes": 3003,
+      "sha256": "d6b4ee1ad2f9d5752e4f51639d3ef436cba28fae6c728a8b615849b8877420d2"
     },
     {
       "file": "flow-state.js",
@@ -44,8 +44,8 @@
     },
     {
       "file": "kit.js",
-      "bytes": 25900,
-      "sha256": "c70e077cbc28e1d1914ffa7c47990a8320091418b59862ab5554f2c59098b48b"
+      "bytes": 26254,
+      "sha256": "f542d08139101810c61ef7006abb8bee0efd5a86eae06358f3c30a92515b76fd"
     },
     {
       "file": "theme-boot.js",

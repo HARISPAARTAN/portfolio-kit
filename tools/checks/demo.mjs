@@ -87,6 +87,8 @@ async function run(theme, width) {
   const [scrollWidth, innerWidth] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
   check(`${tag}: no horizontal page scroll`, scrollWidth <= innerWidth, `${scrollWidth} <= ${innerWidth}`);
   check(`${tag}: four KPI tiles`, (await page.locator('#kpis .pf-kpi').count()) === 4);
+  const footer = (await page.locator('.pf-footer p').first().textContent()).trim();
+  check(`${tag}: the footer says this is a component gallery with invented values`, footer === 'Component gallery of portfolio-kit. Every value on this page is invented.', footer);
   const orphans = await page.$$eval('a[href^="#"]', (links) => links.filter((a) => !document.getElementById(decodeURIComponent(a.hash.slice(1)))).map((a) => a.getAttribute('href')));
   check(`${tag}: every in-page link has a target`, orphans.length === 0, orphans.join(' '));
   const weight = await page.evaluate(() => [...performance.getEntriesByType('navigation'), ...performance.getEntriesByType('resource')].reduce((s, e) => s + e.decodedBodySize, 0));
@@ -177,12 +179,15 @@ async function run(theme, width) {
   check(`${tag}: device frames fit their column`, frames.every((f) => f.fits && f.scale > 0 && f.scale <= 1) && (width < 700 ? phone.scale < 1 : phone.scale === 1) && tablet.scale < 1, `phone ${phone.scale}, tablet ${tablet.scale}`);
 
   const other = theme === 'dark' ? 'light' : 'dark';
+  const named = (t) => `Theme: ${t === 'light' ? 'Light' : 'Dark'}`;
+  const namedBefore = await page.getByRole('button', { name: named(theme), exact: true }).count();
   await page.locator('.pf-theme-toggle').click();
   const toggled = await page.evaluate(() => {
     const b = document.querySelector('.pf-theme-toggle');
-    return { theme: document.documentElement.getAttribute('data-theme'), stored: localStorage.getItem('hh-theme'), label: b.textContent, pressed: b.getAttribute('aria-pressed') };
+    return { theme: document.documentElement.getAttribute('data-theme'), stored: localStorage.getItem('hh-theme'), label: b.textContent, pressed: b.hasAttribute('aria-pressed') };
   });
-  check(`${tag}: the theme toggle switches to ${other} and stores hh-theme`, toggled.theme === other && toggled.stored === other && toggled.label.endsWith(other === 'light' ? 'Light' : 'Dark') && toggled.pressed === String(other === 'light'), toggled.label);
+  const namedAfter = await page.getByRole('button', { name: named(other), exact: true }).count();
+  check(`${tag}: the theme toggle switches to ${other}, stores hh-theme and is named "${named(other)}" without aria-pressed`, toggled.theme === other && toggled.stored === other && toggled.label.endsWith(other === 'light' ? 'Light' : 'Dark') && !toggled.pressed && namedBefore === 1 && namedAfter === 1, `${toggled.label}; named ${namedBefore}/${namedAfter}`);
 
   check(`${tag}: no external request, HTTP error, console error or page error`, problems.length === 0, problems.slice(0, 3).join('; '));
   await ctx.close();

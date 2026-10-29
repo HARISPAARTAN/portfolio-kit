@@ -1,4 +1,4 @@
-// portfolio-kit chart colours and ECharts themes. Values checked with an OKLCH palette validator (README, "Chart palette"); ECharts itself is not shipped.
+// portfolio-kit chart colours and ECharts themes. Values checked with an OKLCH palette validator (README, section "`echarts-theme.js` and the chart palette"); ECharts itself is not shipped.
 const pair = (dark, light) => Object.freeze({ dark: Object.freeze(dark), light: Object.freeze(light) });
 
 export const palette = pair(

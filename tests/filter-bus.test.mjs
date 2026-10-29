@@ -37,6 +37,42 @@ test('toggle compares arrays and objects by value', () => {
   assert.deepEqual(bus.state(), {});
 });
 
+test('set keeps a frozen copy, so changing the array afterwards changes nothing', () => {
+  const bus = createFilterBus();
+  const calls = [];
+  bus.subscribe((state, change) => calls.push(change));
+  const regions = ['North'];
+  bus.set('regions', regions);
+  assert.ok(Object.isFrozen(bus.get('regions')));
+  assert.notEqual(bus.get('regions'), regions);
+  regions.push('South');
+  assert.deepEqual(bus.get('regions'), ['North']);
+  assert.deepEqual(bus.state(), { regions: ['North'] });
+  bus.set('regions', regions);
+  assert.deepEqual(bus.get('regions'), ['North', 'South']);
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls[1], { dim: 'regions', value: ['North', 'South'] });
+  assert.throws(() => bus.get('regions').push('East'), TypeError);
+});
+
+test('plain objects are copied and frozen too, and toggle stores a copy', () => {
+  const bus = createFilterBus();
+  const range = { from: 1, to: 5 };
+  bus.set('range', range);
+  range.to = 9;
+  assert.deepEqual(bus.get('range'), { from: 1, to: 5 });
+  assert.ok(Object.isFrozen(bus.get('range')));
+  const ids = [1, 2];
+  bus.toggle('ids', ids);
+  ids.length = 0;
+  assert.deepEqual(bus.get('ids'), [1, 2]);
+  bus.toggle('ids', [1, 2]);
+  assert.equal(bus.get('ids'), null);
+  const when = new Date(0);
+  bus.set('when', when);
+  assert.equal(bus.get('when'), when);
+});
+
 test('clear(dim) removes one dimension and clear() removes all', () => {
   const bus = createFilterBus();
   bus.set('region', 'North');

@@ -44,6 +44,11 @@ const FLOORS = [
   ...['bg', 'surface', 'surface-2'].map((bg) => ['muted', bg, 4.5]),
   ['accent-fg', 'accent', 4.5],
   ...[...STATUS, ...CHARTS].map((fg) => [fg, 'surface', 3]),
+  // text uses of these tokens: KPI deltas (ok, danger on surface) and links (accent on bg, surface)
+  ['ok', 'surface', 4.5],
+  ['danger', 'surface', 4.5],
+  ['accent', 'bg', 4.5],
+  ['accent', 'surface', 4.5],
 ];
 
 export function checkTokens(t) {

@@ -50,7 +50,7 @@ test('the hub colours are unchanged', () => {
 for (const theme of ['dark', 'light']) {
   test(`${theme} theme meets every contrast floor`, () => {
     const rows = checkTokens(tokens[theme]);
-    assert.equal(rows.length, 25);
+    assert.equal(rows.length, 29);
     assert.deepEqual(rows.filter((r) => !r.pass).map((r) => `${r.pair}: ${r.value} < ${r.min}`), []);
   });
 }

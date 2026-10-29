@@ -18,20 +18,37 @@ export function createStore(ns, { version = 1, storage } = {}) {
   }
   let mem = null;
   let inMemory = !backend;
+  const clear = () => {
+    mem = null;
+    inMemory = !backend;
+    try {
+      backend?.removeItem(key);
+    } catch {
+      /* nothing to remove */
+    }
+  };
   return {
     key,
     available: Boolean(backend),
     load() {
-      if (inMemory) return mem === null ? null : JSON.parse(mem);
       try {
-        const raw = backend.getItem(key);
+        const raw = inMemory ? mem : backend.getItem(key);
         return raw === null || raw === undefined ? null : JSON.parse(raw);
       } catch {
         return null;
       }
     },
     save(obj) {
-      const text = JSON.stringify(obj);
+      let text;
+      try {
+        text = JSON.stringify(obj);
+      } catch {
+        return false;
+      }
+      if (text === undefined) {
+        clear();
+        return !inMemory;
+      }
       if (backend) {
         try {
           backend.setItem(key, text);
@@ -46,19 +63,14 @@ export function createStore(ns, { version = 1, storage } = {}) {
       inMemory = true;
       return false;
     },
-    clear() {
-      mem = null;
-      inMemory = !backend;
-      try {
-        backend?.removeItem(key);
-      } catch {
-        /* nothing to remove */
-      }
-    },
+    clear,
   };
 }
 
 const same = (a, b) => a === b || (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null && JSON.stringify(a) === JSON.stringify(b));
+
+const isPlain = (v) => v !== null && typeof v === 'object' && [Object.prototype, null].includes(Object.getPrototypeOf(v));
+const keep = (v) => (Array.isArray(v) ? Object.freeze([...v]) : isPlain(v) ? Object.freeze({ ...v }) : v);
 
 export function createFilterBus() {
   let state = Object.freeze({});
@@ -66,7 +78,8 @@ export function createFilterBus() {
   const emit = (change) => {
     for (const fn of [...subs]) fn(state, change);
   };
-  const put = (dim, value) => {
+  const put = (dim, input) => {
+    const value = keep(input);
     const has = Object.hasOwn(state, dim);
     if (value === null || value === undefined ? !has : has && same(state[dim], value)) return;
     const next = { ...state };
@@ -220,11 +233,9 @@ export function mountThemeToggle(el) {
   toggles.set(el, ac);
   const theme = globalThis.pfTheme;
   const label = h('span');
-  const btn = h('button', { type: 'button', class: 'pf-btn pf-btn--ghost pf-btn--sm pf-theme-toggle' }, h('span', { 'aria-hidden': 'true', text: '◐' }), label);
+  const btn = h('button', { type: 'button', class: 'pf-btn pf-btn--ghost pf-btn--sm pf-theme-toggle' }, h('span', { 'aria-hidden': 'true', text: '◐' }), h('span', { class: 'pf-visually-hidden', text: 'Theme: ' }), label);
   const sync = () => {
-    const light = theme?.get() === 'light';
-    label.textContent = light ? 'Light' : 'Dark';
-    btn.setAttribute('aria-pressed', String(light));
+    label.textContent = theme?.get() === 'light' ? 'Light' : 'Dark';
   };
   if (theme) btn.addEventListener('click', () => theme.toggle());
   else btn.disabled = true;

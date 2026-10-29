@@ -103,6 +103,45 @@ test('corrupt JSON loads as null', () => {
   assert.equal(createStore('demo', { storage }).load(), null);
 });
 
+test('a value that cannot be serialised is refused and not kept', () => {
+  const storage = memoryStorage();
+  const store = createStore('demo', { storage });
+  store.save({ a: 1 });
+  const loop = {};
+  loop.self = loop;
+  assert.equal(store.save(loop), false);
+  assert.equal(store.save({ big: 10n }), false);
+  assert.deepEqual(store.load(), { a: 1 });
+  const memory = createStore('demo', { storage: throwing });
+  assert.equal(memory.save(loop), false);
+  assert.equal(memory.load(), null);
+});
+
+test('saving undefined clears the value', () => {
+  const storage = memoryStorage();
+  const store = createStore('demo', { storage });
+  store.save({ a: 1 });
+  assert.equal(store.save(undefined), true);
+  assert.equal(store.load(), null);
+  assert.equal(storage.map.has('pf.demo.v1'), false);
+  const memory = createStore('demo', { storage: throwing });
+  memory.save({ a: 1 });
+  assert.equal(memory.save(undefined), false);
+  assert.equal(memory.load(), null);
+});
+
+test('the in-memory value round-trips and an unreadable one loads as null', () => {
+  const store = createStore('demo', { storage: throwing });
+  assert.equal(store.save({ a: [1, 2], b: 'x' }), false);
+  assert.deepEqual(store.load(), { a: [1, 2], b: 'x' });
+  assert.equal(store.save(null), false);
+  assert.equal(store.load(), null);
+  assert.equal(store.save('text'), false);
+  assert.equal(store.load(), 'text');
+  const odd = createStore('demo', { storage: { getItem: () => undefined, setItem: blocked, removeItem: blocked } });
+  assert.equal(odd.load(), null);
+});
+
 test('the namespace must be a non-empty string', () => {
   assert.throws(() => createStore(''), TypeError);
   assert.throws(() => createStore(42), TypeError);
