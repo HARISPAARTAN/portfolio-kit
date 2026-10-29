@@ -123,6 +123,7 @@ const num = (v, opts, tail = (s) => s) => {
   const n = toNumber(v);
   return n === null ? DASH : tail(nf(opts).format(n).replace('-', MINUS));
 };
+const COMPACT = [[1e12, 't'], [1e9, 'b'], [1e6, 'm'], [1e3, 'k']];
 const fixed = (digits, signDisplay = 'negative') => ({ minimumFractionDigits: digits, maximumFractionDigits: digits, signDisplay });
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const pad2 = (n) => String(n).padStart(2, '0');
@@ -145,7 +146,18 @@ export const fmt = {
   int: (n) => num(n, fixed(0)),
   dec: (n, digits = 1) => num(n, fixed(digits)),
   money: (n, currency = 'EUR', digits = 0) => num(n, { style: 'currency', currency, ...fixed(digits) }),
-  compact: (n) => num(n, { notation: 'compact', maximumFractionDigits: 1, signDisplay: 'negative' }, (s) => s.toLowerCase()),
+  compact: (n) => {
+    const v = toNumber(n);
+    if (v === null) return DASH;
+    let i = COMPACT.findIndex(([limit]) => Math.abs(v) >= limit);
+    if (i < 0) return num(v, { maximumFractionDigits: 1, signDisplay: 'negative' });
+    let text = nf({ maximumFractionDigits: 1, signDisplay: 'negative', useGrouping: false }).format(v / COMPACT[i][0]);
+    if (Math.abs(Number(text)) >= 1000 && i > 0) {
+      i -= 1;
+      text = nf({ maximumFractionDigits: 1, signDisplay: 'negative', useGrouping: false }).format(v / COMPACT[i][0]);
+    }
+    return text.replace('-', MINUS) + COMPACT[i][1];
+  },
   pct: (x, digits = 1) => num(x, { style: 'percent', ...fixed(digits) }, (s) => s.replace('%', `${NBSP}%`)),
   pp: (x, digits = 1) => num(x, { style: 'percent', ...fixed(digits, 'exceptZero') }, (s) => s.replace('%', `${NBSP}pp`)),
   signed: (n, digits = 0) => num(n, fixed(digits, 'exceptZero')),

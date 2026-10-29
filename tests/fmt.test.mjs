@@ -36,6 +36,8 @@ test('compact shortens large numbers with lower-case suffixes', () => {
   assert.equal(fmt.compact(-1500), `${M}1.5k`);
   assert.equal(fmt.compact(3.4e6), '3.4m');
   assert.equal(fmt.compact(2.5e9), '2.5b');
+  assert.equal(fmt.compact(999950), '1m');
+  assert.equal(fmt.compact(1e12), '1t');
 });
 
 test('pct turns a fraction into a percentage', () => {
