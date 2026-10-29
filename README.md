@@ -16,7 +16,7 @@ Component gallery with invented sample data: https://harispaartan.github.io/port
 v0.1.0, not published yet. Checked locally before the first push:
 
 - 95 unit tests pass on Node 22 plus 20 Python tests for the sync script without any package (`node --test "tests/*.test.mjs"`): contrast floors of both themes, the flow state machine, store, filter bus, formatters, CSV, sorting, chart palette and themes, the manifest and the offline scan.
-- Size limits hold: `kit.js` 25,789 of 40,960 bytes, `base.css` 12,910 of 30,720, `tokens.css` 1,635 of 6,144, every font below 122,880.
+- Size limits hold: `kit.js` 25,900 of 40,960 bytes, `base.css` 12,910 of 30,720, `tokens.css` 1,635 of 6,144, every font below 122,880.
 - `dist/` and `demo/` contain no `http://`, `https://` or protocol-relative reference other than the repository link and the SVG namespace (the font licence file is exempt).
 - `dist/MANIFEST.json` matches the 11 files of `dist/`; a vendoring round trip with `tools/sync_kit.py` copies them, confirms the copy and reports a changed file.
 - The page check (`tools/checks/demo.mjs`, Playwright driving Chrome) passes 96 checks on `demo/`: dark and light at 1440 and 390 px (fonts loaded, banner, no horizontal scroll, in-page links, page weight 181 KB, all 51 controls reachable with Tab, sorting, paging, filtering with the saved state, reset, CSV download, keyboard tabs, the flow player in auto-play and programmatic mode, labels not cut short, device frames, theme toggle, no external request, HTTP error or console error), a run with reduced motion and the redirect of the root page.
