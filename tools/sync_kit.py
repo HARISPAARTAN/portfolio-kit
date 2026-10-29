@@ -8,7 +8,8 @@ file into their own tools/ folder. Python 3.10 or newer, standard library only.
   python tools/sync_kit.py --check               compare web/kit/ with dist/ at the tag named in web/kit/VERSION
   python tools/sync_kit.py --check --kit .kit    the same against another clone (the consumer's CI)
 
-The kit clone defaults to $PORTFOLIO_KIT, then E:/GITGUB/portfolio-kit.
+The kit clone defaults to $PORTFOLIO_KIT, then the portfolio-kit folder next to the repository that holds this
+script (<repo>/tools/sync_kit.py, so <repo>/../portfolio-kit).
 An existing destination is replaced only when it is an earlier copy of the kit (MANIFEST.json with the name
 portfolio-kit, and VERSION) or an empty folder. The new copy is written to a temporary sibling folder and
 moved into place once it is complete and matches its MANIFEST.json, so a failed run leaves the old copy alone.
@@ -35,6 +36,15 @@ KIT_NAME = "portfolio-kit"
 
 class Refused(Exception):
     """The copy or the check cannot go on; main() prints the message and exits with 1."""
+
+
+def default_kit() -> str:
+    """$PORTFOLIO_KIT, else the sibling clone of the repository this script lives in (<repo>/tools/sync_kit.py)."""
+    env = os.environ.get("PORTFOLIO_KIT")
+    if env:
+        return env
+    parents = Path(__file__).resolve().parents
+    return str(parents[2] / KIT_NAME) if len(parents) > 2 else KIT_NAME
 
 
 def die(message: str) -> NoReturn:
@@ -240,7 +250,7 @@ def check(kit: str, tag: str | None, dest: Path) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Vendor portfolio-kit's dist/ into web/kit/, or check the copy.")
     parser.add_argument("--tag", help="tag or commit of portfolio-kit; --check defaults to the tag in <dest>/VERSION")
-    parser.add_argument("--kit", default=os.environ.get("PORTFOLIO_KIT", "E:/GITGUB/portfolio-kit"), help="local clone of portfolio-kit")
+    parser.add_argument("--kit", default=default_kit(), help="local clone of portfolio-kit (default: $PORTFOLIO_KIT, else ../portfolio-kit next to the repository holding this script)")
     parser.add_argument("--dest", default=Path("web/kit"), type=Path, help="vendored folder (default: web/kit)")
     parser.add_argument("--check", action="store_true", help="compare instead of copying")
     args = parser.parse_args(argv)

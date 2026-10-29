@@ -15,11 +15,11 @@ Component gallery with invented sample data: https://harispaartan.github.io/port
 
 v0.1.0, not published yet. Checked locally before the first push:
 
-- 95 unit tests pass on Node 22 plus 20 Python tests for the sync script without any package (`node --test "tests/*.test.mjs"`): contrast floors of both themes, the flow state machine, store, filter bus, formatters, CSV, sorting, chart palette and themes, the manifest and the offline scan.
-- Size limits hold: `kit.js` 25,900 of 40,960 bytes, `base.css` 12,910 of 30,720, `tokens.css` 1,635 of 6,144, every font below 122,880.
+- 100 unit tests pass on Node 22 without any package (`node --test "tests/*.test.mjs"`): contrast floors of both themes, the flow state machine, store, filter bus, formatters, CSV, sorting, chart palette and themes, the manifest and the offline scan. 20 Python tests pass for the sync script (`python -X utf8 -m unittest discover -s tests -p "test_*.py"`, standard library only).
+- Size limits hold: `kit.js` 26,254 of 40,960 bytes, `base.css` 12,910 of 30,720, `tokens.css` 1,635 of 6,144, every font below 122,880.
 - `dist/` and `demo/` contain no `http://`, `https://` or protocol-relative reference other than the repository link and the SVG namespace (the font licence file is exempt).
 - `dist/MANIFEST.json` matches the 11 files of `dist/`; a vendoring round trip with `tools/sync_kit.py` copies them, confirms the copy and reports a changed file.
-- The page check (`tools/checks/demo.mjs`, Playwright driving Chrome) passes 96 checks on `demo/`: dark and light at 1440 and 390 px (fonts loaded, banner, no horizontal scroll, in-page links, page weight 181 KB, all 51 controls reachable with Tab, sorting, paging, filtering with the saved state, reset, CSV download, keyboard tabs, the flow player in auto-play and programmatic mode, labels not cut short, device frames, theme toggle, no external request, HTTP error or console error), a run with reduced motion and the redirect of the root page.
+- The page check (`tools/checks/demo.mjs`, Playwright driving Chrome) passes 100 checks on `demo/`: dark and light at 1440 and 390 px (fonts loaded, banner, no horizontal scroll, footer line, in-page links, page weight 182 KB, all 51 controls reachable with Tab, sorting, paging, filtering with the saved state, reset, CSV download, keyboard tabs, the flow player in auto-play and programmatic mode, labels not cut short, device frames, theme toggle, no external request, HTTP error or console error), a run with reduced motion and the redirect of the root page.
 - Both categorical chart palettes pass every check of the palette validator; the sequential and diverging ramps pass its ordinal checks.
 
 Not tested: browsers other than Chrome, screen readers.
@@ -41,7 +41,7 @@ portfolio-kit bündelt das gemeinsame Erscheinungsbild und die Browser-Hilfen de
 | `dist/fonts/` | `fonts.css`, Inter, Space Grotesk and JetBrains Mono as variable woff2 files, and their licence |
 | `dist/MANIFEST.json` | name, version, and bytes and SHA-256 of every other file in `dist/` |
 | `demo/index.html` | the component gallery, published on Pages |
-| `tests/` | unit tests for `node --test` |
+| `tests/` | unit tests: `*.test.mjs` for `node --test`, `test_sync_kit.py` for `python -m unittest` |
 | `tools/` | `contrast.mjs`, `check_size.mjs`, `check_offline.mjs`, `manifest.mjs`, `sync_kit.py` (the reference vendoring script) and `checks/demo.mjs` (the page check) |
 
 ## Quick start
@@ -87,7 +87,9 @@ renderTable(document.getElementById('orders'), { columns: [{ key: 'id', label: '
 </html>
 ```
 
-The order matters: the stylesheets and `theme-boot.js` sit in `<head>`, so the theme is set before the first paint; `kit.js` is a module and runs after parsing.
+The order matters: the stylesheets and `theme-boot.js` sit in `<head>`, so the theme is set before the first paint; `kit.js` is a module and runs after parsing. Serve the folder over HTTP (for example `python -m http.server` in `web/`): ES modules do not load from `file://`.
+
+The footer line is the one the nine demo repositories carry; the component gallery in this repository says "Component gallery of portfolio-kit. Every value on this page is invented." instead.
 
 ## Tokens
 
@@ -132,10 +134,12 @@ Contrast (WCAG 2.x), checked by `tests/contrast.test.mjs` against `dist/tokens.c
 | `--muted` on `--bg`, `--surface`, `--surface-2` | 4.5 | 7.29, 6.77, 6.13 | 5.57, 5.98, 5.20 |
 | `--accent-fg` on `--accent` | 4.5 | 9.30 | 5.02 |
 | `--ok`, `--warn`, `--danger`, `--info` on `--surface` | 3 | 10.09, 11.65, 6.45, 9.36 | 5.02, 4.92, 6.47, 5.93 |
+| `--ok`, `--danger` on `--surface` (KPI deltas) | 4.5 | 10.09, 6.45 | 5.02, 6.47 |
+| `--accent` on `--bg`, `--surface` (links) | 4.5 | 9.62, 8.93 | 4.68, 5.02 |
 | `--chart-1` … `--chart-8` on `--surface` | 3 | 5.49, 4.66, 6.00, 5.21, 3.82, 5.97, 4.40, 5.41 | 5.02, 5.93, 5.02, 6.98, 3.71, 7.16, 3.75, 7.90 |
 | pill text on its tint: ok, warn, danger, info, muted, accent | 4.5 | 7.47, 8.11, 6.04, 7.18, 6.25, 7.15 | 5.50, 5.44, 6.51, 6.13, 6.24, 5.56 |
 
-The status and chart colours colour marks, borders and tints; text in them uses the pill mix below, never the plain token on a light surface.
+The status and chart colours colour marks, borders and tints. Text in them uses the pill mix (see Pill), with two exceptions that use the plain token: KPI deltas (`.pf-kpi__delta--up` and `--down`) in `--ok` and `--danger` on `--surface`, and links in `--accent` on `--bg` and `--surface`; the test holds both at 4.5:1. In light mode `--accent` on `--surface-2` reaches only 4.36:1, so links on that surface use `color: inherit` with the accent underline, as tables do.
 
 ## Base styles
 
@@ -172,6 +176,8 @@ All classes start with `pf-`. Everything works at 390 px without horizontal page
   </footer>
 </div>
 ```
+
+The first line is the one the demo repositories use for a client project they rebuild; the gallery's footer carries its own line (see the Quick start).
 
 ### Banner
 
@@ -282,7 +288,7 @@ All classes start with `pf-`. Everything works at 390 px without horizontal page
 
 ### Device frames
 
-`.pf-frame` with `.pf-frame--phone` (inner viewport 390 × 844) or `.pf-frame--tablet` (1024 × 720) draws a rounded bezel; `.pf-frame__screen` is the viewport and scrolls inside. `fitFrame()` sets `--scale` so the frame fits its parent's content width.
+`.pf-frame` with `.pf-frame--phone` (inner viewport 390 × 844) or `.pf-frame--tablet` (1024 × 720) draws a rounded bezel; `.pf-frame__screen` is the viewport and scrolls inside. `fitFrame()` sets `--scale` so the frame fits its parent's content width. The focus ring of `.pf-frame__screen` is drawn inside the screen (`outline-offset: -4px`), a deliberate exception to the 2 px offset of every other element: the frame clips its overflow, so an outside ring would be cut off.
 
 ```html
 <div class="pf-frame pf-frame--phone" id="phone">
@@ -292,7 +298,7 @@ All classes start with `pf-`. Everything works at 390 px without horizontal page
 
 ### Flow player
 
-`FlowPlayer` renders into an element with the class `.pf-flow`: `.pf-flow__diagram` (an inline SVG with `g.pf-flow__node[data-id][data-status]`, its `.pf-flow__glyph` and `.pf-flow__name`, `path.pf-flow__edge` with `data-done` once traversed, the arrowhead `.pf-flow__arrow` and the moving `circle.pf-flow__dot`), `.pf-flow__controls`, the step list `ol.pf-flow__steps` with `li.pf-flow__step` (`data-status`, `aria-current="step"` on the current step), `.pf-flow__idx` and `.pf-flow__detail`, and a polite live region. Status colours: running `--accent`, ok `--ok`, failed `--danger`, skipped `--muted` with a dashed outline.
+`FlowPlayer` renders into the element you pass and adds the class `.pf-flow` to it itself: `.pf-flow__diagram` (an inline SVG with `g.pf-flow__node[data-id][data-status]`, its `.pf-flow__glyph` and `.pf-flow__name`, `path.pf-flow__edge` with `data-done` once traversed, the arrowhead `.pf-flow__arrow` and the moving `circle.pf-flow__dot`), `.pf-flow__controls`, the step list `ol.pf-flow__steps` with `li.pf-flow__step` (`data-status`, `aria-current="step"` on the current step), `.pf-flow__idx` and `.pf-flow__detail`, and a polite live region. Status colours: running `--accent`, ok `--ok`, failed `--danger`, skipped `--muted` with a dashed outline.
 
 ### Empty state
 
@@ -327,7 +333,7 @@ Renderers create elements with the DOM API (never `innerHTML` with data) and are
 
 ### `createStore(ns, { version = 1, storage } = {})`
 
-Returns `{ key, available, load(), save(obj), clear() }`. The key is `pf.<ns>.v<version>`; values are JSON in `localStorage`, every access is wrapped in try/catch. When storage is blocked or throws, `available` is `false` and the value lives in memory for the page view; `save` returns `true` only when the value reached storage. A new `version` starts empty and leaves the old key alone. `storage` replaces `localStorage` (used by the tests).
+Returns `{ key, available, load(), save(obj), clear() }`. The key is `pf.<ns>.v<version>`; values are JSON in `localStorage`, every access is wrapped in try/catch. When storage is blocked or throws, `available` is `false` and the value lives in memory for the page view; `save` returns `true` only when the value reached storage; it returns `false` and keeps nothing for a value that cannot be written as JSON (a circular structure), and `save(undefined)` is the same as `clear()`. A new `version` starts empty and leaves the old key alone. `storage` replaces `localStorage` (used by the tests). All the demos are served from the origin `harispaartan.github.io` and so share one `localStorage`: `ns` must be unique per repository (use the repository name).
 
 ```js
 const store = createStore('orders-demo');   // key 'pf.orders-demo.v1'
@@ -338,7 +344,7 @@ store.clear();
 
 ### `createFilterBus()`
 
-Returns `{ state(), get(dim), set(dim, value), toggle(dim, value), clear(dim?), subscribe(fn) }`. The state is a frozen object; `set(dim, null)` removes a dimension; `toggle` sets the value or removes it when it is already the value (click to cross-filter, click again to clear); arrays and objects compare by value; `get` returns `null` for a missing dimension. Subscribers run synchronously after every change with `(state, { dim, value })`; calls that change nothing notify nobody; `subscribe` returns the unsubscribe function.
+Returns `{ state(), get(dim), set(dim, value), toggle(dim, value), clear(dim?), subscribe(fn) }`. The state is a frozen object; `set(dim, null)` removes a dimension; `toggle` sets the value or removes it when it is already the value (click to cross-filter, click again to clear); arrays and plain objects compare by value and are stored as frozen shallow copies, so changing the array you passed in afterwards changes nothing (set it again to change the state); `get` returns the stored frozen value, or `null` for a missing dimension. Subscribers run synchronously after every change with `(state, { dim, value })`; calls that change nothing notify nobody; `subscribe` returns the unsubscribe function.
 
 ```js
 const bus = createFilterBus();
@@ -353,7 +359,7 @@ off();
 
 ### `fmt`
 
-Formatters in the `en-GB` locale built on `Intl.NumberFormat`. Negative numbers use the minus sign U+2212, never a hyphen; `%` and `pp` follow a no-break space (U+00A0, shown as a space below); `null`, `undefined`, `NaN`, infinities, empty strings, booleans and dates that cannot be read render as an en dash `–`. Numeric strings are read as numbers.
+Formatters in the `en-GB` locale built on `Intl.NumberFormat`. Negative numbers use the minus sign U+2212, never a hyphen; `%` and `pp` follow a no-break space (U+00A0, shown as a space below); `null`, `undefined`, `NaN`, infinities, empty strings, booleans and dates that cannot be read render as an en dash `–`. Numeric strings are read as numbers. Signatures: `int(n)`, `dec(n, digits = 1)`, `money(n, currency = 'EUR', digits = 0)`, `compact(n)`, `pct(x, digits = 1)`, `pp(x, digits = 1)`, `signed(n, digits = 0)`, `date(iso)`, `dateTime(iso)`.
 
 | Call | Result |
 |---|---|
@@ -402,7 +408,7 @@ mountBanner({ repoUrl: 'https://github.com/HARISPAARTAN/data-cleaning-tool' });
 
 ### `mountThemeToggle(el)`
 
-Renders a `.pf-theme-toggle` button into `el` and returns it. The label names the current theme ("Dark" or "Light"), `aria-pressed` is `true` in light, a click calls `window.pfTheme.toggle()`, and the label follows every `pf:theme` event. Without `theme-boot.js` the button is disabled.
+Renders a `.pf-theme-toggle` button into `el` and returns it. The visible label names the current theme ("Dark" or "Light") and a visually hidden prefix makes the accessible name "Theme: Dark" or "Theme: Light"; there is no `aria-pressed`, because a toggle whose label changes with its state would be announced wrongly. A click calls `window.pfTheme.toggle()` and the label follows every `pf:theme` event. Without `theme-boot.js` the button is disabled.
 
 ```js
 mountThemeToggle(document.getElementById('theme'));
@@ -472,7 +478,7 @@ tabs.select('tab-done');
 
 ### `FlowPlayer`
 
-`new FlowPlayer(el, { state, orientation = 'auto', stepMs = 900, autoplay = false, controls = true })` draws the steps of a `createFlowState` state as boxes and arrows (a row when `el` is at least 720 px wide, a column otherwise; `orientation: 'row'` or `'column'` forces one), a step list with the details, and, with `controls`, the buttons Play (Pause while playing, Replay at the end) and "Skip animation". Steps with edges between them are laid out in layers, so a branch shows side by side. While playing it calls `state.next()` every `stepMs` and moves a dot along the arrow. Labels that do not fit are shortened with `…`, measured after the fonts have loaded. The live region announces "Step 3 of 9: Classify", with " (done)", " (failed)" or " (skipped)" for finished steps, and "Ready: 9 steps" after a reset. Under reduced motion no dot moves, autoplay does not start and Play applies every step at once. Methods: `play()`, `pause()`, `skipToEnd()`, `destroy()`. A new player on the same element destroys the old one.
+`new FlowPlayer(el, { state, orientation = 'auto', stepMs = 900, autoplay = false, controls = true })` draws the steps of a `createFlowState` state as boxes and arrows (a row when `el` is at least 720 px wide, a column otherwise; `orientation: 'row'` or `'column'` forces one), a step list with the details, and, with `controls`, the buttons Play (Pause while playing, Replay at the end) and "Skip animation". Steps with edges between them are laid out in layers, so a branch shows side by side. While playing it calls `state.next()` every `stepMs` and moves a dot along the arrow. Labels that do not fit are shortened with `…`, measured after the fonts have loaded. The live region announces "Step 3 of 9: Classify", with " (done)", " (failed)" or " (skipped)" for finished steps, and "Ready: 9 steps" after a reset. Under reduced motion no dot moves, autoplay does not start and Play applies every step at once. Methods: `play()`, `pause()`, `skipToEnd()`, `destroy()`. A new player on the same element destroys the old one. `play()`, Skip animation and `next()` walk the steps in array order and ignore `edges`; for a branching flow pass `controls: false` and drive it with `show`, `skip` and `fail`.
 
 ```js
 const state = createFlowState({ steps: [{ id: 'intake', label: 'Intake', detail: 'Read 40 rows' }, { id: 'validate', label: 'Validate' }, { id: 'export', label: 'Export' }] });
@@ -509,7 +515,7 @@ The state machine behind the player, with no DOM, so it is tested in Node.
 | `statuses()` | `{ [id]: 'idle' | 'running' | 'ok' | 'failed' | 'skipped' }` |
 | `done()` | `true` when every step is ok, failed or skipped |
 | `start()` | resets and marks the first step running |
-| `next()` | marks the running step ok and the next idle step running (after the current one first, then from the start); `false` when no idle step is left |
+| `next()` | marks the running step ok and the next idle step running (after the current one first, then from the start); `false` when no idle step is left; it walks the steps in array order and ignores `edges`, so for a branching flow drive the state with `show`, `skip` and `fail` |
 | `show(idOrIndex, { status = 'ok', detail } = {})` | sets one step's status and detail and makes it current |
 | `fail(idOrIndex, detail?)` | marks a step failed and makes it current |
 | `skip(idOrIndex)` | marks a step skipped; the current step stays |
@@ -572,7 +578,7 @@ The palette was checked with an OKLCH palette validator against the page backgro
 | Normal-vision separation of neighbours | ΔE ≥ 15 | worst 15.7 (`#02AB70` and `#058DB5`) | worst 18.4 (`#00948A` and `#3B6201`) |
 | Contrast against the page background | 3:1 | all 8 | all 8 |
 
-The ramps pass the validator's ordinal checks (one hue per ramp or arm, monotone lightness, a gap of at least 0.06 in L between steps, the step nearest the background at 2:1 or more): sequential light 2.06, sequential dark 2.22, rose arm light 2.30, teal arm light 2.04, rose arm dark 3.46, teal arm dark 3.97. Compared with the first draft, all eight dark colours moved down into the lightness band, and in light rose and lime moved apart in lightness and teal gained chroma. The dark chart colours are therefore darker than the status tokens of the same hue: tokens colour text-sized marks on surfaces, chart colours colour areas and lines.
+The ramps pass the validator's ordinal checks (one hue per ramp or arm, monotone lightness, a gap of at least 0.06 in L between steps, the step nearest the background at 2:1 or more): sequential light 2.06, sequential dark 2.22, rose arm light 2.30, teal arm light 2.04, rose arm dark 3.46, teal arm dark 3.97. The dark chart colours are darker than the status tokens of the same hue: tokens colour text-sized marks on surfaces, chart colours colour areas and lines.
 
 Order the series so that the most important one takes `--chart-1`, and label lines directly where they end, so no reader depends on colour alone.
 
@@ -580,14 +586,14 @@ Order the series so that the most important one takes `--chart-1`, and label lin
 
 Consumers copy `dist/` at a tag into `web/kit/` and never edit the copy. The reference script is `tools/sync_kit.py` (Python 3.10 or newer, standard library only); copy it into the consuming repository's `tools/` folder.
 
-1. Keep a clone of this repository next to the consumer (the script's default is `E:/GITGUB/portfolio-kit`; set `PORTFOLIO_KIT` or pass `--kit` for another path) and fetch the tags: `git -C E:/GITGUB/portfolio-kit fetch --tags`.
+1. Keep a clone of this repository next to the consumer (the script's default is the sibling folder `../portfolio-kit`, found from the script's own location; set `PORTFOLIO_KIT` or pass `--kit` for another path) and fetch the tags: `git -C ../portfolio-kit fetch --tags`.
 2. From the consumer's root, copy the kit at a tag:
 
    ```bash
    python tools/sync_kit.py --tag v0.1.0
    ```
 
-   The script reads `dist/` at the tag with `git archive` (committed content only, nothing from the network), checks every file against the archived `MANIFEST.json`, replaces `web/kit/` (it refuses a folder that has files but no `MANIFEST.json`) and writes `web/kit/VERSION` with the tag. Output: `copied 11 files of portfolio-kit v0.1.0 into web/kit`.
+   The script reads `dist/` at the tag with `git archive` (committed content only, nothing from the network), checks every file against the archived `MANIFEST.json`, replaces `web/kit/` and writes `web/kit/VERSION` with the tag. It replaces a destination only when that is missing, empty or an earlier copy of the kit (a `MANIFEST.json` with the name `portfolio-kit` and a `VERSION` file); otherwise it refuses and exits 1. `--dest` names another folder than `web/kit`. Output: `copied 11 files of portfolio-kit v0.1.0 into web/kit`.
 3. Keep the bytes exactly as copied, whatever `core.autocrlf` says, with this line in the consumer's `.gitattributes`:
 
    ```text
@@ -602,11 +608,12 @@ Consumers copy `dist/` at a tag into `web/kit/` and never edit the copy. The ref
          - name: Read the pinned kit version
            id: kit
            run: echo "tag=$(cat web/kit/VERSION)" >> "$GITHUB_OUTPUT"
-         - uses: actions/checkout@v4
+         - uses: actions/checkout@v7
            with:
              repository: HARISPAARTAN/portfolio-kit
              ref: ${{ steps.kit.outputs.tag }}
              path: .kit
+             persist-credentials: false
          - name: Vendored kit matches its tag
            run: python3 tools/sync_kit.py --check --kit .kit
    ```
@@ -617,10 +624,11 @@ The pages load the files relatively, as in the quick start: `kit/fonts/fonts.css
 
 ## Development
 
-Node 22 runs everything; there is no `package.json`.
+Node 22 runs everything except the tests of the sync script, which need Python 3.10 or newer; there is no `package.json`.
 
 ```bash
 node --test "tests/*.test.mjs"    # unit tests
+python -X utf8 -m unittest discover -s tests -p "test_*.py"   # tests of tools/sync_kit.py
 node tools/contrast.mjs           # contrast of every token pair, exit 1 below a floor
 node tools/check_size.mjs         # kit.js ≤ 40 KB, base.css ≤ 30 KB, tokens.css ≤ 6 KB, each font ≤ 120 KB
 node tools/check_offline.mjs      # no reference to another host in dist/ or demo/
@@ -634,7 +642,7 @@ The page check needs Playwright and Chrome. It loads Playwright with `createRequ
 PLAYWRIGHT_FROM="$HOME/playwright-host/package.json" OUT="$HOME/kit-shots" node tools/checks/demo.mjs
 ```
 
-CI (`.github/workflows/ci.yml`) runs the unit tests, the size, offline and manifest checks and a vendoring round trip with `tools/sync_kit.py` on pushes to `main`, on version tags and on pull requests; `pages.yml` runs the tests and the offline and manifest checks again and publishes the repository root to Pages on every push to `main`.
+CI (`.github/workflows/ci.yml`) runs the unit tests, the size, offline and manifest checks, a vendoring round trip with `tools/sync_kit.py` and the Python tests on pushes to `main`, on version tags and on pull requests; `pages.yml` runs the tests and the offline and manifest checks again and publishes the repository root to Pages on every push to `main`.
 
 A release: update `CHANGELOG.md` and `VERSION`, run `node tools/manifest.mjs`, commit `chore: release X.Y.Z`, create an annotated tag `vX.Y.Z` and push it; consumers then sync to the new tag.
 

@@ -14,4 +14,5 @@ First release.
 - `dist/echarts-theme.js`: categorical palette, sequential and diverging ramps, status colours and the `pf-dark` and `pf-light` ECharts themes.
 - `dist/fonts/`: Inter, Space Grotesk and JetBrains Mono as variable woff2 files with the complete SIL Open Font License 1.1.
 - `dist/MANIFEST.json` and `tools/sync_kit.py`: sizes and SHA-256 of the vendored files and the reference script that copies and checks them.
-- The component gallery `demo/index.html` on GitHub Pages; unit tests, size, offline and manifest checks and a vendoring round trip in CI.
+- The component gallery `demo/index.html` on GitHub Pages; unit tests, size, offline and manifest checks, a vendoring round trip and the Python tests in CI.
+- Behaviours to rely on: the filter bus stores frozen shallow copies of arrays and plain objects, so changing the array you passed in changes nothing; `createStore().save` returns `false` and keeps nothing for a value that cannot be serialised, and `save(undefined)` clears; `mountThemeToggle` names its button "Theme: Dark" or "Theme: Light" and has no `aria-pressed`; `FlowPlayer` playback and `next()` walk the steps in array order and ignore `edges`, so a branching flow uses `controls: false` and `show`, `skip` and `fail`; the contrast test holds KPI delta and link colours at 4.5:1.
