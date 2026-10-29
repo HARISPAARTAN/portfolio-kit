@@ -29,3 +29,5 @@ jobs:
         run: |
           python3 tools/sync_kit.py --kit . --tag HEAD --dest "$RUNNER_TEMP/consumer/web/kit"
           python3 tools/sync_kit.py --kit . --tag HEAD --dest "$RUNNER_TEMP/consumer/web/kit" --check
+      - name: Python unit tests
+        run: python3 -X utf8 -m unittest discover -s tests -p "test_*.py" -v
