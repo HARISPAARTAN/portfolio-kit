@@ -56,6 +56,19 @@ test('theme(mode) maps the tokens onto the ECharts theme keys', () => {
   assert.equal(theme('dark').valueAxis.splitLine.lineStyle.color, 'rgba(31,42,54,0.5)');
 });
 
+test('theme(mode) follows the text, surface, border and muted tokens of both modes', () => {
+  for (const m of MODES) {
+    const t = theme(m);
+    assert.deepEqual(t.color, [...palette[m]], m);
+    assert.equal(t.textStyle.color, tokens[m].text, m);
+    assert.equal(t.tooltip.backgroundColor, tokens[m].surface, m);
+    assert.equal(t.tooltip.borderColor, tokens[m].border, m);
+    assert.equal(t.valueAxis.axisLine.lineStyle.color, tokens[m].border, m);
+    assert.equal(t.valueAxis.axisLabel.color, tokens[m].muted, m);
+    assert.deepEqual(t.visualMap.inRange.color, [...sequential[m]], m);
+  }
+});
+
 test('theme returns a new object on every call', () => {
   const a = theme('dark');
   a.color.push('#000000');
