@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fmt } from '../dist/kit.js';
 
-const M = '−';
-const NB = ' ';
-const DASH = '–';
+const M = '\u2212';
+const NB = '\u00A0';
+const DASH = '\u2013';
 
 test('int rounds and groups with en-GB separators', () => {
   assert.equal(fmt.int(0), '0');
@@ -86,10 +86,12 @@ test('date and dateTime show the wall-clock value written in the ISO string', ()
   assert.equal(fmt.dateTime('2025-10-01 17:45:12'), '01 Oct 2025 17:45');
   assert.equal(fmt.dateTime('2025-10-01'), '01 Oct 2025 00:00');
   assert.equal(fmt.date(new Date(Date.UTC(2025, 0, 2, 12))), '02 Jan 2025');
+  assert.equal(fmt.dateTime('2025-10-01T09:00:00Z'), '01 Oct 2025 09:00');
+  assert.equal(fmt.dateTime('2025-10-01T09:00:00.250+02:00'), '01 Oct 2025 09:00');
 });
 
 test('dates that cannot be read render as an en dash', () => {
-  for (const v of [null, undefined, '', 'not a date', '2025-13-01', '01.10.2025', new Date('nope'), 20251001]) {
+  for (const v of [null, undefined, '', 'not a date', '2025-13-01', '01.10.2025', '2025-10-01garbage', '2025-10-01T09', '2025-10-01T9:00', new Date('nope'), 20251001]) {
     assert.equal(fmt.date(v), DASH, String(v));
     assert.equal(fmt.dateTime(v), DASH, String(v));
   }

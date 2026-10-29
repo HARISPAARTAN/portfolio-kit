@@ -1,9 +1,9 @@
 // portfolio-kit kit.js: storage, filter bus, formatters, CSV, sorting, renderers, tabs, device frames and the flow player. ES module, no dependencies.
 export { createFlowState } from './flow-state.js';
 
-const DASH = '–';
-const MINUS = '−';
-const NBSP = ' ';
+const DASH = '\u2013';
+const MINUS = '\u2212';
+const NBSP = '\u00A0';
 
 export function createStore(ns, { version = 1, storage } = {}) {
   if (typeof ns !== 'string' || ns === '') throw new TypeError('createStore: ns must be a non-empty string');
@@ -119,7 +119,7 @@ function wallClock(v) {
     if (Number.isNaN(v.getTime())) return null;
     p = [v.getUTCFullYear(), v.getUTCMonth() + 1, v.getUTCDate(), v.getUTCHours(), v.getUTCMinutes()];
   } else {
-    const m = typeof v === 'string' ? /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(v) : null;
+    const m = typeof v === 'string' ? /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/.exec(v) : null;
     if (!m) return null;
     p = m.slice(1).map((x) => Number(x ?? 0));
   }
@@ -153,7 +153,7 @@ export function toCsv(rows, columns, { delimiter = ',', bom = true, escapeFormul
     return s.includes(delimiter) || /["\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const lines = [columns.map((c) => cell(c.label ?? c.key)), ...rows.map((row) => columns.map((c) => cell(row[c.key])))];
-  return `${bom ? '﻿' : ''}${lines.map((l) => l.join(delimiter)).join('\r\n')}\r\n`;
+  return `${bom ? '\uFEFF' : ''}${lines.map((l) => l.join(delimiter)).join('\r\n')}\r\n`;
 }
 
 const collator = new Intl.Collator('en-GB', { numeric: true, sensitivity: 'base' });

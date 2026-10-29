@@ -5,7 +5,7 @@ import { toCsv } from '../dist/kit.js';
 const columns = [{ key: 'id', label: 'Order' }, { key: 'note', label: 'Note' }, { key: 'amount', label: 'Amount' }];
 
 test('header from the columns in their order, CRLF line ends and a BOM by default', () => {
-  assert.equal(toCsv([{ amount: 12.5, note: 'ok', id: 'SO-1' }], columns), '﻿Order,Note,Amount\r\nSO-1,ok,12.5\r\n');
+  assert.equal(toCsv([{ amount: 12.5, note: 'ok', id: 'SO-1' }], columns), '\uFEFFOrder,Note,Amount\r\nSO-1,ok,12.5\r\n');
 });
 
 test('bom: false leaves the BOM out', () => {
