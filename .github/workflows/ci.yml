@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit tests
+        run: node --test "tests/*.test.mjs"
+      - name: Size limits
+        run: node tools/check_size.mjs
+      - name: No external references
+        run: node tools/check_offline.mjs
+      - name: Manifest is current
+        run: node tools/manifest.mjs --check
+      - name: Vendoring round trip
+        run: |
+          python3 tools/sync_kit.py --kit . --tag HEAD --dest "$RUNNER_TEMP/consumer/web/kit"
+          python3 tools/sync_kit.py --kit . --tag HEAD --dest "$RUNNER_TEMP/consumer/web/kit" --check
