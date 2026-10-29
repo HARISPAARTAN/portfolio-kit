@@ -13,7 +13,7 @@ Component gallery with invented sample data: https://harispaartan.github.io/port
 
 ## Status
 
-v0.1.0, not published yet. Checked locally before the first push:
+v0.1.0, released: annotated tag `v0.1.0` and a GitHub Release with the `dist/` archive. Before the release the `ci` and `pages` workflows passed on GitHub, and the page check passed against the live demo with the same 100 checks as locally. Checked locally:
 
 - 100 unit tests pass on Node 22 without any package (`node --test "tests/*.test.mjs"`): contrast floors of both themes, the flow state machine, store, filter bus, formatters, CSV, sorting, chart palette and themes, the manifest and the offline scan. 20 Python tests pass for the sync script (`python -X utf8 -m unittest discover -s tests -p "test_*.py"`, standard library only).
 - Size limits hold: `kit.js` 26,793 of 40,960 bytes, `base.css` 12,910 of 30,720, `tokens.css` 1,635 of 6,144, every font below 122,880.

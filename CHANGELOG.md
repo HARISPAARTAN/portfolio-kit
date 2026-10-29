@@ -2,7 +2,7 @@
 
 Versions are git tags; a consuming repository pins one in `web/kit/VERSION`.
 
-## v0.1.0 (unreleased)
+## v0.1.0 (2026-10-29)
 
 First release.
 
