@@ -388,6 +388,7 @@ export function initTabs(list, { onChange } = {}) {
     if (tabs.includes(tab)) select(tab);
   }, { signal: ac.signal });
   list.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
     const i = tabs.indexOf(e.target);
     const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
     if (i < 0 || to === undefined) return;
@@ -413,7 +414,7 @@ export class FlowPlayer {
     flowCount += 1;
     Object.assign(this, { el, state, orientation, stepMs, uid: `pf-flow-${flowCount}`, timer: 0, raf: 0, rof: 0, width: 0, playing: false, quiet: false, last: state.current()?.id ?? null });
     this.diagram = h('div', { class: 'pf-flow__diagram' });
-    this.list = h('ol', { class: 'pf-flow__steps' });
+    this.list = h('ol', { class: 'pf-flow__steps', role: 'list' });
     this.live = h('p', { class: 'pf-visually-hidden', 'aria-live': 'polite' });
     this.playBtn = controls ? h('button', { type: 'button', class: 'pf-btn pf-btn--primary pf-btn--sm', onclick: () => (this.playing ? this.pause() : this.play()) }, 'Play') : null;
     const bar = controls ? h('div', { class: 'pf-flow__controls' }, this.playBtn, h('button', { type: 'button', class: 'pf-btn pf-btn--ghost pf-btn--sm', onclick: () => this.skipToEnd() }, 'Skip animation')) : null;
