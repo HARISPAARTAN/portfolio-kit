@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>portfolio-kit component gallery</title>
+<meta name="description" content="Tokens, components, browser helpers and the flow player of portfolio-kit, in dark and light.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../dist/fonts/fonts.css">
+<link rel="stylesheet" href="../dist/tokens.css">
+<link rel="stylesheet" href="../dist/base.css">
+<script src="../dist/theme-boot.js"></script>
+<style>
+.d-intro p{max-width:70ch;margin-top:var(--space-3);color:var(--muted);font-size:var(--fs-lg)}
+.d-section{margin-top:var(--space-8)}
+.d-section>h2{margin-bottom:var(--space-2)}
+.d-lead{max-width:70ch;margin-bottom:var(--space-5);color:var(--muted)}
+.d-swatch{display:flex;align-items:center;gap:var(--space-3);min-width:0;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface)}
+.d-swatch strong{display:block;font-family:var(--font-mono);font-size:var(--fs-sm);font-weight:500}
+.d-swatch code{display:block;color:var(--muted);font-size:var(--fs-xs)}
+.d-color{flex:none;width:40px;height:40px;border:1px solid var(--border);border-radius:var(--radius-sm)}
+.d-t1{font-family:var(--font-display);font-size:var(--fs-2xl);font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.d-t2{font-family:var(--font-display);font-size:var(--fs-xl);font-weight:600;line-height:1.15}
+.d-t3{font-family:var(--font-display);font-size:var(--fs-lg);font-weight:600}
+.d-num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.d-filters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--space-3);margin-bottom:var(--space-4)}
+.d-field{display:flex;flex-direction:column;gap:var(--space-1)}
+.d-field label{color:var(--muted);font-size:var(--fs-sm)}
+.d-gap{margin-top:var(--space-4)}
+.d-frames{display:grid;align-items:start;gap:var(--space-5)}
+@media (min-width:900px){.d-frames{grid-template-columns:minmax(0,416px) minmax(0,1fr)}}
+.d-slot{min-width:0}
+.d-screen{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-6) var(--space-4)}
+.d-bar{height:10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 55%,var(--surface-2))}
+.d-line{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-size:var(--fs-sm)}
+.d-ramp{display:flex;gap:2px}
+.d-ramp span{flex:1;height:32px;border-radius:4px}
+.d-hex{margin-top:var(--space-3);color:var(--muted);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="pf-page">
+<header class="pf-header">
+<a class="pf-brand" href="./"><span class="pf-brand__mark" aria-hidden="true">HH</span>portfolio-kit</a>
+<nav class="pf-header__nav" aria-label="Sections">
+<a href="#tokens">Tokens</a><a href="#type">Type</a><a href="#kpis-section">KPIs</a><a href="#table">Table</a><a href="#controls">Controls</a><a href="#frames">Frames</a><a href="#flow">Flow</a><a href="#charts">Charts</a>
+</nav>
+<div class="pf-header__tools"><span id="theme-slot"></span><button type="button" class="pf-btn pf-btn--ghost pf-btn--sm" id="reset-demo">Reset demo</button></div>
+</header>
+<main>
+<div class="d-intro">
+<h1>portfolio-kit</h1>
+<p>The shared tokens, components and browser helpers of the portfolio demos, in both themes. Every number on this page is invented.</p>
+</div>
+
+<section class="d-section" id="tokens" aria-labelledby="tokens-h">
+<h2 id="tokens-h">Colour tokens</h2>
+<p class="d-lead">The values of the current theme with their contrast ratios, computed on this page with the formula of <code>tools/contrast.mjs</code>.</p>
+<div class="pf-grid" id="swatches" style="--min:230px"></div>
+</section>
+
+<section class="d-section" id="type" aria-labelledby="type-h">
+<h2 id="type-h">Typography</h2>
+<p class="d-lead">Space Grotesk for headings, Inter for text, JetBrains Mono for labels and numbers. Scale: 12, 14, 16, 20, 28 and 40 px.</p>
+<div class="pf-card pf-stack">
+<p class="pf-label">Label, 12 px mono, upper case</p>
+<p class="d-t1">Display, 40 px</p>
+<p class="d-t2">Heading, 28 px</p>
+<p class="d-t3">Heading, 20 px</p>
+<p>Body text at 16 px with a line height of 1.5, <a href="#type">a text link</a> and <code>inline code</code>.</p>
+<p class="d-num" id="numbers"></p>
+</div>
+</section>
+
+<section class="d-section" id="kpis-section" aria-labelledby="kpis-h">
+<h2 id="kpis-h">KPI tiles</h2>
+<p class="d-lead">Rendered with <code>renderKpi</code> from the orders below, so they follow the filters. Direction shows as ▲ ▼ ● as well as in colour.</p>
+<div class="pf-grid" id="kpis" style="--min:220px"><div></div><div></div><div></div><div></div></div>
+</section>
+
+<section class="d-section" id="table" aria-labelledby="table-h">
+<h2 id="table-h">Table, filters and CSV</h2>
+<p class="d-lead">Forty invented orders. Sort any column, page through them and filter by region or status. The filters live in a filter bus and are saved with <code>createStore</code>; the CSV button exports the rows in their current order.</p>
+<div class="d-filters">
+<div class="pf-chips" id="region-chips" role="group" aria-label="Region">
+<button type="button" class="pf-chip" data-region="North" aria-pressed="false">North</button>
+<button type="button" class="pf-chip" data-region="South" aria-pressed="false">South</button>
+<button type="button" class="pf-chip" data-region="East" aria-pressed="false">East</button>
+<button type="button" class="pf-chip" data-region="West" aria-pressed="false">West</button>
+</div>
+<div class="d-field"><label for="status-filter">Status</label><select class="pf-select" id="status-filter"><option value="">All statuses</option><option>Delivered</option><option>Shipped</option><option>Open</option><option>Cancelled</option></select></div>
+<button type="button" class="pf-btn pf-btn--primary" id="csv">Download CSV</button>
+</div>
+<div id="orders"></div>
+</section>
+
+<section class="d-section" id="controls" aria-labelledby="controls-h">
+<h2 id="controls-h">Pills, buttons, inputs and tabs</h2>
+<p class="d-lead">Pills tint their colour into the surface and mix a quarter of the text colour into their label, so every pill reads at 4.5:1 or more.</p>
+<div class="pf-grid" style="--min:300px">
+<div class="pf-card"><h3 class="pf-card__title">Pills</h3><div class="pf-row" id="pills"></div></div>
+<div class="pf-card"><h3 class="pf-card__title">Buttons</h3><div class="pf-row"><button type="button" class="pf-btn pf-btn--primary">Primary</button><button type="button" class="pf-btn">Default</button><button type="button" class="pf-btn pf-btn--ghost">Ghost</button><button type="button" class="pf-btn pf-btn--sm">Small</button><button type="button" class="pf-btn" disabled>Disabled</button><a class="pf-btn pf-btn--ghost" href="#flow">Link button</a></div></div>
+<div class="pf-card"><h3 class="pf-card__title">Inputs</h3><div class="pf-stack"><div class="d-field"><label for="demo-search">Search</label><input class="pf-input" id="demo-search" type="search" placeholder="Order number"></div><div class="d-field"><label for="demo-period">Period</label><select class="pf-select" id="demo-period"><option>September 2025</option><option selected>October 2025</option></select></div></div></div>
+<div class="pf-card"><h3 class="pf-card__title">Empty state</h3><div class="pf-empty"><strong>No orders yet</strong><span>Orders appear here once the first one is booked.</span></div></div>
+</div>
+<div class="pf-card d-gap">
+<h3 class="pf-card__title">Tabs</h3>
+<div class="pf-tabs" role="tablist" aria-label="Order views" id="demo-tabs">
+<button type="button" class="pf-tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true">Overview</button>
+<button type="button" class="pf-tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" tabindex="-1">Lines</button>
+<button type="button" class="pf-tab" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false" tabindex="-1">History</button>
+</div>
+<div class="pf-tabpanel" role="tabpanel" id="panel-1" aria-labelledby="tab-1" tabindex="0"><p>Overview panel. Use the arrow keys, Home and End to move between the tabs.</p></div>
+<div class="pf-tabpanel" role="tabpanel" id="panel-2" aria-labelledby="tab-2" tabindex="0" hidden><p>Lines panel: units, prices and totals of one order.</p></div>
+<div class="pf-tabpanel" role="tabpanel" id="panel-3" aria-labelledby="tab-3" tabindex="0" hidden><p>History panel: every status change with its date.</p></div>
+</div>
+</section>
+
+<section class="d-section" id="frames" aria-labelledby="frames-h">
+<h2 id="frames-h">Device frames</h2>
+<p class="d-lead">A phone viewport of 390 × 844 and a tablet viewport of 1024 × 720 with placeholder screens; <code>fitFrame</code> scales each one to its column.</p>
+<div class="d-frames">
+<div class="d-slot">
+<div class="pf-frame pf-frame--phone" id="phone">
+<div class="pf-frame__screen" tabindex="0" role="region" aria-label="Phone screen placeholder">
+<div class="d-screen">
+<p class="pf-label">Orders today</p>
+<p class="d-t2 d-num">€4,280</p>
+<div class="d-bar" style="width:72%"></div>
+<div class="d-line"><span>SO-1038</span><span class="pf-pill pf-pill--ok">Delivered</span></div>
+<div class="d-line"><span>SO-1039</span><span class="pf-pill pf-pill--info">Shipped</span></div>
+<div class="d-line"><span>SO-1040</span><span class="pf-pill pf-pill--warn">Open</span></div>
+<p class="pf-label">Placeholder screen, 390 × 844</p>
+</div>
+</div>
+</div>
+</div>
+<div class="d-slot">
+<div class="pf-frame pf-frame--tablet" id="tablet">
+<div class="pf-frame__screen" tabindex="0" role="region" aria-label="Tablet screen placeholder">
+<div class="d-screen">
+<p class="pf-label">Placeholder screen, 1024 × 720</p>
+<div class="pf-grid" style="--min:200px">
+<div class="pf-kpi"><span class="pf-kpi__label pf-label">Revenue</span><span class="pf-kpi__value">€54,454</span></div>
+<div class="pf-kpi"><span class="pf-kpi__label pf-label">Orders</span><span class="pf-kpi__value">40</span></div>
+<div class="pf-kpi"><span class="pf-kpi__label pf-label">Delivered</span><span class="pf-kpi__value">47.5 %</span></div>
+</div>
+<div class="d-bar" style="width:86%"></div>
+<div class="d-bar" style="width:64%"></div>
+<div class="d-bar" style="width:41%"></div>
+<div class="d-line"><span>North</span><span class="d-num">9 orders</span></div>
+<div class="d-line"><span>West</span><span class="d-num">14 orders</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="d-section" id="flow" aria-labelledby="flow-h">
+<h2 id="flow-h">Flow player</h2>
+<p class="d-lead">Auto-play runs nine steps, one every 900 ms; "Skip animation" jumps to the end. In the programmatic flow the buttons call <code>show</code>, <code>skip</code> and <code>fail</code> on the state, and the player only draws.</p>
+<div class="pf-card"><h3 class="pf-card__title">Auto-play</h3><div id="flow-auto"></div></div>
+<div class="pf-card d-gap">
+<h3 class="pf-card__title">Programmatic</h3>
+<div class="pf-row" id="flow-manual-controls">
+<button type="button" class="pf-btn pf-btn--sm" data-action="receive">Receive</button>
+<button type="button" class="pf-btn pf-btn--sm" data-action="check">Check</button>
+<button type="button" class="pf-btn pf-btn--sm" data-action="approve">Approve</button>
+<button type="button" class="pf-btn pf-btn--sm" data-action="reject">Reject</button>
+<button type="button" class="pf-btn pf-btn--sm" data-action="book">Book</button>
+<button type="button" class="pf-btn pf-btn--sm" data-action="fail">Fail booking</button>
+<button type="button" class="pf-btn pf-btn--sm" data-action="archive">Archive</button>
+<button type="button" class="pf-btn pf-btn--ghost pf-btn--sm" data-action="reset">Reset</button>
+</div>
+<div id="flow-manual" class="d-gap"></div>
+</div>
+</section>
+
+<section class="d-section" id="charts" aria-labelledby="charts-h">
+<h2 id="charts-h">Chart palette</h2>
+<p class="d-lead">The categorical palette and the two ramps of <code>echarts-theme.js</code> for the current theme, checked with an OKLCH palette validator for lightness, chroma, colour-vision separation and contrast. ECharts itself is not loaded here.</p>
+<div class="pf-grid" id="chart-swatches" style="--min:300px"></div>
+</section>
+</main>
+
+<footer class="pf-footer">
+<p>Rebuilt from memory as a demo. The original client's name and data are not used.</p>
+<p>portfolio-kit v0.1.0 · MIT licence; fonts under the SIL Open Font License 1.1 · <a href="https://github.com/HARISPAARTAN/portfolio-kit">Source on GitHub</a></p>
+</footer>
+</div>
+
+<script type="module">
+import { FlowPlayer, createFilterBus, createFlowState, createStore, download, fitFrame, fmt, initTabs, mountBanner, mountThemeToggle, pill, renderKpi, renderTable, toCsv } from '../dist/kit.js';
+import { diverging, palette, sequential } from '../dist/echarts-theme.js';
+import { ratio } from '../tools/contrast.mjs';
+
+const $ = (id) => document.getElementById(id);
+const make = (tag, className, text) => {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined) el.textContent = text;
+  return el;
+};
+const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
+
+mountBanner({ repoUrl: 'https://github.com/HARISPAARTAN/portfolio-kit', text: 'Component gallery of portfolio-kit with invented sample data' });
+mountThemeToggle($('theme-slot'));
+
+function swatches() {
+  const names = ['bg', 'surface', 'surface-2', 'border', 'text', 'muted', 'accent', 'accent-fg', 'ok', 'warn', 'danger', 'info'];
+  $('swatches').replaceChildren(...names.map((name) => {
+    const against = name === 'accent-fg' ? 'accent' : 'surface';
+    const box = make('div', 'd-swatch');
+    const color = make('span', 'd-color');
+    color.style.background = `var(--${name})`;
+    const text = make('div');
+    text.append(make('strong', '', `--${name}`), make('code', '', `${token(name)} · ${ratio(token(name), token(against)).toFixed(2)}:1 on --${against}`));
+    box.append(color, text);
+    return box;
+  }));
+}
+
+function charts() {
+  const mode = window.pfTheme?.get() ?? 'dark';
+  const block = (title, colors) => {
+    const card = make('div', 'pf-card');
+    const ramp = make('div', 'd-ramp');
+    ramp.append(...colors.map((c) => {
+      const s = make('span');
+      s.style.background = c;
+      s.title = c;
+      return s;
+    }));
+    card.append(make('h3', 'pf-card__title', title), ramp, make('p', 'd-hex', colors.join(' ')));
+    return card;
+  };
+  $('chart-swatches').replaceChildren(block(`Categorical, ${mode}`, palette[mode]), block(`Sequential, ${mode}, low to high`, sequential[mode]), block(`Diverging, ${mode}, negative to positive`, diverging[mode]));
+}
+
+$('numbers').textContent = [fmt.dec(1234567.891, 2), fmt.int(-2345), fmt.compact(15300), fmt.pct(0.123), fmt.pp(0.012), fmt.dateTime('2025-10-01T09:00')].join(' · ');
+$('pills').replaceChildren(...[['Delivered', 'ok'], ['Shipped', 'info'], ['Open', 'warn'], ['Cancelled', 'danger'], ['Draft', 'muted'], ['New', 'accent']].map(([text, kind]) => pill(text, kind)));
+
+function mulberry32(seed) {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rnd = mulberry32(20251001);
+const pick = (list) => list[Math.floor(rnd() * list.length)];
+const PRODUCTS = [['Widget A', 24], ['Widget B', 39], ['Gadget C', 129], ['Service plan', 249], ['Spare parts', 12.5]];
+const REGIONS = ['North', 'South', 'East', 'West'];
+const STATUSES = ['Delivered', 'Delivered', 'Delivered', 'Shipped', 'Shipped', 'Open', 'Cancelled'];
+const PILL_KIND = { Delivered: 'ok', Shipped: 'info', Open: 'warn', Cancelled: 'danger' };
+const ORDERS = Array.from({ length: 40 }, (_, i) => {
+  const [product, price] = pick(PRODUCTS);
+  const units = 1 + Math.floor(rnd() * 40);
+  const date = new Date(Date.UTC(2025, 8, 1 + Math.floor(rnd() * 61))).toISOString().slice(0, 10);
+  return { id: `SO-${1001 + i}`, date, region: pick(REGIONS), product, units, revenue: Math.round(units * price * 100) / 100, status: pick(STATUSES) };
+});
+const COLUMNS = [
+  { key: 'id', label: 'Order' },
+  { key: 'date', label: 'Date', format: (v) => fmt.date(v) },
+  { key: 'region', label: 'Region' },
+  { key: 'product', label: 'Product' },
+  { key: 'units', label: 'Units', align: 'right', format: (v) => fmt.int(v) },
+  { key: 'revenue', label: 'Revenue', align: 'right', format: (v) => fmt.money(v, 'EUR', 2) },
+  { key: 'status', label: 'Status', format: (v) => pill(v, PILL_KIND[v]) },
+];
+
+const store = createStore('portfolio-kit-demo');
+const bus = createFilterBus();
+const saved = store.load();
+if (Array.isArray(saved?.region) && saved.region.length) bus.set('region', saved.region);
+if (typeof saved?.status === 'string') bus.set('status', saved.status);
+const filtered = () => {
+  const { region, status } = bus.state();
+  return ORDERS.filter((o) => (!region || region.includes(o.region)) && (!status || o.status === status));
+};
+
+const sum = (list) => list.reduce((s, o) => s + o.revenue, 0);
+const delivered = (list) => (list.length ? list.filter((o) => o.status === 'Delivered').length / list.length : null);
+const trend = (x) => (x === null || Math.abs(x) < 0.0005 ? 'neutral' : x > 0 ? 'up' : 'down');
+function kpis() {
+  const list = filtered();
+  const sep = list.filter((o) => o.date < '2025-10-01');
+  const oct = list.filter((o) => o.date >= '2025-10-01');
+  const change = sum(sep) ? sum(oct) / sum(sep) - 1 : null;
+  const shift = sep.length && oct.length ? delivered(oct) - delivered(sep) : null;
+  const tiles = [
+    { label: 'Revenue', value: fmt.money(sum(list)), delta: { text: change === null ? 'no September orders' : `${change > 0 ? '+' : ''}${fmt.pct(change)} Oct vs Sep`, kind: trend(change) }, caption: 'September and October 2025' },
+    { label: 'Orders', value: fmt.int(list.length), delta: { text: `${fmt.int(oct.length)} in October`, kind: 'neutral' }, caption: `${fmt.int(list.reduce((s, o) => s + o.units, 0))} units` },
+    { label: 'Average order', value: list.length ? fmt.money(sum(list) / list.length, 'EUR', 2) : fmt.money(null), caption: 'Revenue per order' },
+    { label: 'Delivered', value: fmt.pct(delivered(list)), delta: { text: shift === null ? 'no comparison' : `${fmt.pp(shift)} Oct vs Sep`, kind: trend(shift) }, caption: 'Share of orders delivered' },
+  ];
+  [...$('kpis').children].forEach((slot, i) => renderKpi(slot, tiles[i]));
+}
+
+let table;
+const mountTable = () => {
+  table = renderTable($('orders'), { columns: COLUMNS, rows: filtered(), pageSize: 8, caption: 'Orders, September and October 2025' });
+};
+function syncControls() {
+  const region = bus.get('region') ?? [];
+  for (const b of $('region-chips').querySelectorAll('[data-region]')) b.setAttribute('aria-pressed', String(region.includes(b.dataset.region)));
+  $('status-filter').value = bus.get('status') ?? '';
+}
+mountTable();
+kpis();
+syncControls();
+bus.subscribe((state) => {
+  table.update(filtered());
+  kpis();
+  syncControls();
+  if (Object.keys(state).length) store.save(state);
+  else store.clear();
+});
+$('region-chips').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-region]');
+  if (!b) return;
+  const current = bus.get('region') ?? [];
+  const next = current.includes(b.dataset.region) ? current.filter((r) => r !== b.dataset.region) : [...current, b.dataset.region];
+  bus.set('region', next.length ? next : null);
+});
+$('status-filter').addEventListener('change', (e) => bus.set('status', e.target.value || null));
+$('csv').addEventListener('click', () => download('orders.csv', toCsv(table.rows(), COLUMNS.map(({ key, label }) => ({ key, label })))));
+
+initTabs($('demo-tabs'));
+fitFrame($('phone'));
+fitFrame($('tablet'));
+
+const AUTO = [['Intake', 'Read 40 order rows'], ['Validate', 'Check dates, units and prices'], ['Clean', 'Trim text, unify region names'], ['Match', 'Match products to the catalogue'], ['Classify', 'Group orders by status'], ['Enrich', 'Add region and month'], ['Review', 'Flag orders above €5,000'], ['Export', 'Write the CSV file'], ['Report', 'Build the monthly summary']];
+const auto = createFlowState({ steps: AUTO.map(([label, detail]) => ({ id: label.toLowerCase(), label, detail })) });
+new FlowPlayer($('flow-auto'), { state: auto, autoplay: true, stepMs: 900 });
+
+const manual = createFlowState({
+  steps: [
+    { id: 'receive', label: 'Receive', detail: 'Invoice arrives by e-mail' },
+    { id: 'check', label: 'Check', detail: 'Compare it with the order' },
+    { id: 'approve', label: 'Approve' },
+    { id: 'reject', label: 'Reject' },
+    { id: 'book', label: 'Book' },
+    { id: 'notify', label: 'Notify' },
+    { id: 'archive', label: 'Archive' },
+  ],
+  edges: [['receive', 'check'], ['check', 'approve'], ['check', 'reject'], ['approve', 'book'], ['reject', 'notify'], ['book', 'archive'], ['notify', 'archive']],
+});
+new FlowPlayer($('flow-manual'), { state: manual, controls: false });
+const ACTIONS = {
+  receive: () => manual.show('receive', { detail: 'Invoice INV-2042 received' }),
+  check: () => manual.show('check', { detail: 'Amount matches order SO-1012' }),
+  approve: () => {
+    manual.skip('reject');
+    manual.skip('notify');
+    manual.show('approve', { detail: 'Approved by the team lead' });
+  },
+  reject: () => {
+    manual.skip('approve');
+    manual.skip('book');
+    manual.show('reject', { detail: 'Order number missing' });
+  },
+  book: () => manual.show('book', { status: 'running', detail: 'Posting to the ledger' }),
+  fail: () => manual.fail('book', 'Ledger closed for the month'),
+  archive: () => manual.show('archive', { detail: 'Stored for ten years' }),
+  reset: () => manual.reset(),
+};
+$('flow-manual-controls').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-action]');
+  if (b) ACTIONS[b.dataset.action]();
+});
+
+$('reset-demo').addEventListener('click', () => {
+  bus.clear();
+  store.clear();
+  mountTable();
+  kpis();
+  syncControls();
+  manual.reset();
+});
+
+swatches();
+charts();
+document.addEventListener('pf:theme', () => {
+  swatches();
+  charts();
+});
+</script>
+</body>
+</html>
